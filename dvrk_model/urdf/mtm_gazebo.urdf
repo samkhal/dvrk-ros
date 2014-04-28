@@ -266,4 +266,11 @@
       <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
     </inertial>
   </link>
+
+  <gazebo>
+    <plugin name="dv_adnan_control" filename="libdv_adnan_control.so">
+      <robotNamespace>/mtm</robotNamespace>
+    </plugin>
+  </gazebo>
+
 </robot>
