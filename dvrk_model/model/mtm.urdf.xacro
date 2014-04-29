@@ -322,6 +322,11 @@
       </inertial>
     </link>
   </xacro:macro>
+
+  <gazebo>
+    <plugin name="dv_adnan_controller" filename="libdv_adnan_controller.so" />
+  </gazebo>
+
 </robot>
 
 
