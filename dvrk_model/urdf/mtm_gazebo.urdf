@@ -268,9 +268,7 @@
   </link>
 
   <gazebo>
-    <plugin name="dv_adnan_control" filename="libdv_adnan_control.so">
-      <robotNamespace>/mtm</robotNamespace>
-    </plugin>
+    <plugin name="dv_adnan_controller" filename="libdv_adnan_controller.so" />
   </gazebo>
 
 </robot>
