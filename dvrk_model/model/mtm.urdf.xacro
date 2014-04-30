@@ -322,11 +322,23 @@
                                      izz="0.1"/>
       </inertial>
     </link>
-  </xacro:macro>
+  
+  <transmission name="tran1">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="${prefix}outer_yaw_joint"/>
+    <actuator name="motor1">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
 
   <gazebo>
-    <plugin name="dv_adnan_controller" filename="libdv_adnan_controller.so" />
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/mtm</robotNamespace>
+    </plugin>
   </gazebo>
+
+  </xacro:macro>
 
 </robot>
 
