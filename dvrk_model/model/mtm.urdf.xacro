@@ -386,6 +386,16 @@
     </plugin>
   </gazebo>
 
+  <gazebo>
+    <plugin name="force_torque_sensor" filename="libgazebo_ros_f3d.so" >
+      <bodyName>${prefix}bottom_parallel_link</bodyName>
+      <frameName>${prefix}bottom_parallel_link</frameName>
+      <topicName>/force_torque_feedback</topicName>
+      <alwaysOn>true</alwaysOn>
+      <updateRate>100.0</updateRate>
+    </plugin>
+  </gazebo>
+
   </xacro:macro>
 
 </robot>
