@@ -11,7 +11,7 @@
     <arg name="model" default="$(find dvrk_model)/model/mtm_right.urdf.xacro" />
     <arg name="gui" default="true" />
     <arg name="rate" default="20" />
-    <arg name="mimic_tags" default="false" />
+    <arg name="mimic_tags" default="true" />
     
     <param name="robot_description"
            command="rosrun xacro xacro.py $(arg model)"/>
@@ -32,10 +32,6 @@
     <node name="robot_state_publisher"
         pkg="robot_state_publisher"
         type="state_publisher" />
-
-    <node name="mtm_frame_correction"
-        pkg="dvrk_kinematics"
-        type="sim_mtm_node" />
 
     <node name="feedback_mtm_jp" 
           pkg="dvrk_joint_publisher"
