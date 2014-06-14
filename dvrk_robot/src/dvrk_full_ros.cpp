@@ -154,6 +154,19 @@ int main(int argc, char ** argv)
     // IO is shared accross components
     mtsRobotIO1394 * io = new mtsRobotIO1394("io", periodIO, firewirePort);
 
+    // find name of button event used to detect if operator is present
+    std::string operatorPresentComponent = jsonConfig["operator-present"]["component"].asString();
+    std::string operatorPresentInterface = jsonConfig["operator-present"]["interface"].asString();
+    //set defaults
+    if (operatorPresentComponent == "") {
+        operatorPresentComponent = "io";
+    }
+    if (operatorPresentInterface == "") {
+        operatorPresentInterface = "COAG";
+    }
+    std::cout << "Using \"" << operatorPresentComponent << "::" << operatorPresentInterface
+              << "\" to detect if operator is present" << std::endl;
+
     // setup io defined in the json configuration file
     const Json::Value pairs = jsonConfig["pairs"];
 
@@ -294,14 +307,20 @@ int main(int argc, char ** argv)
         componentManager->AddComponent(teleGUI);
         tabWidget->addTab(teleGUI, teleName.c_str());
         mtsTeleOperation * tele = new mtsTeleOperation(teleName, periodTeleop);
+        // Default orientation between master and slave
+        vctMatRot3 master2slave;
+        master2slave.Assign(-1.0, 0.0, 0.0,
+                             0.0,-1.0, 0.0,
+                             0.0, 0.0, 1.0);
+        tele->SetRegistrationRotation(master2slave);
         componentManager->AddComponent(tele);
         // connect teleGUI to tele
         componentManager->Connect(teleGUI->GetName(), "TeleOperation", tele->GetName(), "Setting");
 
         componentManager->Connect(tele->GetName(), "Master", mtm->Name(), "Robot");
         componentManager->Connect(tele->GetName(), "Slave", psm->Name(), "Robot");
-        componentManager->Connect(tele->GetName(), "CLUTCH", "io", "CLUTCH");
-        componentManager->Connect(tele->GetName(), "COAG", "io", "COAG");
+        componentManager->Connect(tele->GetName(), "Clutch", "io", "CLUTCH");
+        componentManager->Connect(tele->GetName(), "OperatorPresent", operatorPresentComponent, operatorPresentInterface);
     }
 
     // Starting ROS-Bridge Here
