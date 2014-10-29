@@ -69,7 +69,7 @@ if (cisst_FOUND_AS_REQUIRED)
     ${sawIntuitiveResearchKit_LIBRARY_DIR}
     )
 
-  set(ROBOTSRC dvrk_mtm_ros dvrk_psm_ros dvrk_full_ros)
+  set(ROBOTSRC dvrk_mtm_ros dvrk_psm_ros dvrk_full_ros dvrk_half_ros)
   foreach(_robot ${ROBOTSRC})
     add_executable (${_robot} src/${_robot}.cpp)
     target_link_libraries (${_robot}
