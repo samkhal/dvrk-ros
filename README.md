@@ -52,3 +52,7 @@ catkin_make
   * main file to start robot, publish & subscribe ros topics 
 * dvrk\_joint\_publisher:
   * publish named joint states (position + velocity)
+* dvrk\pcl
+  * demonstration of stereovision
+  * topics include raw images from left and right cameras, disparity map and point cloud 
+  * launch files 
