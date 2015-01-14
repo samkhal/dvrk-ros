@@ -110,6 +110,10 @@ int main(int argc, char** argv)
   componentManager->AddComponent(psm);
   componentManager->Connect(psm->GetName(), "PID", pid->GetName(), "Controller");
   componentManager->Connect(psm->GetName(), "RobotIO", "io", config_name);
+  componentManager->Connect(psm->GetName(), "Adapter", "io", psm->GetName() + "-Adapter");
+  componentManager->Connect(psm->GetName(), "Tool", "io", psm->GetName() + "-Tool");
+  componentManager->Connect(psm->GetName(), "ManipClutch", "io", psm->GetName() + "-ManipClutch");
+  componentManager->Connect(psm->GetName(), "SUJClutch", "io", psm->GetName() + "-SUJClutch");
 
   // psm GUI
   mtsIntuitiveResearchKitArmQtWidget* psmGUI = new mtsIntuitiveResearchKitArmQtWidget(config_name+"GUI");
@@ -132,6 +136,8 @@ int main(int argc, char** argv)
         pid->GetName(), "GetEffortJoint", "/dvrk_psm/joint_effort_current");
   robotBridge.AddPublisherFromReadCommand<prmPositionJointGet, sensor_msgs::JointState>(
         pid->GetName(), "GetPositionJoint", "/dvrk_psm/joint_position_current");
+  robotBridge.AddPublisherFromEventWrite<prmEventButton, std_msgs::Bool>(
+  "ManipClutch","Button","/dvrk_psm/manip_clutch_state");
 
 
   // Finally Working Form; However it is still unsafe since there is no safety check.
@@ -150,6 +156,7 @@ int main(int argc, char** argv)
   componentManager->AddComponent(&robotBridge);
   componentManager->Connect(robotBridge.GetName(), config_name, psm->GetName(), "Robot");
   componentManager->Connect(robotBridge.GetName(), pid->GetName(), pid->GetName(),"Controller");
+  componentManager->Connect(robotBridge.GetName(), "ManipClutch", "io", config_name + "-ManipClutch");
 
 //  componentManager->Connect(robotBridge.GetName(), "Clutch", "io", "CLUTCH");
 
