@@ -132,7 +132,7 @@ int main(int argc, char** argv)
   robotBridge.AddPublisherFromReadCommand<double, std_msgs::Float32>  (
         config_name, "GetGripperPosition", "/dvrk_mtm/gripper_position_current");
   robotBridge.AddPublisherFromReadCommand<vctDoubleVec, cisst_msgs::vctDoubleVec>(
-        pid->GetName(), "GetEffortJoint", "/dvrk_mtm/joint_effort_current");
+        pid->GetName(), "GetEffortJointDesired", "/dvrk_mtm/joint_effort_current");
   robotBridge.AddPublisherFromEventWrite<prmEventButton, std_msgs::Bool>(
               "Clutch","Button","/dvrk_footpedal/clutch_state");
   robotBridge.AddPublisherFromEventWrite<prmEventButton, std_msgs::Bool>(

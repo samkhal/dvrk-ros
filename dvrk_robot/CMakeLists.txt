@@ -72,6 +72,16 @@ if (cisst_FOUND_AS_REQUIRED)
     ${sawIntuitiveResearchKit_LIBRARY_DIR}
     )
 
+
+ add_executable (cartesian_pose_node src/Listeners/psm_tf_listener.cpp)
+  target_link_libraries(cartesian_pose_node      
+     ${sawRobotIO1394_LIBRARIES}
+      ${sawIntuitiveResearchKit_LIBRARIES}
+      ${sawControllers_LIBRARIES}
+      ${sawConstraintController_LIBRARIES}
+      ${catkin_LIBRARIES} )
+
+
   set(ROBOTSRC dvrk_mtm_ros dvrk_psm_ros dvrk_full_ros dvrk_half_ros)
   foreach(_robot ${ROBOTSRC})
     add_executable (${_robot} src/${_robot}.cpp)
