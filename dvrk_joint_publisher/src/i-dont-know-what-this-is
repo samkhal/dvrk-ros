@@ -1,0 +1,18 @@
+
+
+p = pose.position
+q = pose.orientation
+
+sqw = q.w**2
+sqx = q.x**2
+sqy = q.y**2
+sqz = q.z**2
+
+invs = 1 / (sqx + sqy + sqz + sqw)
+m00 = (sqx-sqy-sqz+sqw)*invs
+m11 = (-sqx+sqy-sqz+sqw)*invs
+m22 = (-sqx-sqy+sqz+sqw)*invs
+
+tmp1 = q.x*q.z
+tmp2 = q.y*q.w
+m20 = 

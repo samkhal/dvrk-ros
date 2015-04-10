@@ -1,0 +1,7 @@
+<launch>
+
+    <!-- joint publisher -->
+    <node name="test_broadcaster" pkg="dvrk_joint_publisher" type="test_broadcaster" output="screen"/>
+  
+  
+</launch>

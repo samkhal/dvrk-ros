@@ -1,0 +1,5 @@
+<launch>
+    <node name="cartesian_pose_node"
+        pkg="dvrk_robot"
+        type="cartesian_pose_node" />
+</launch>
