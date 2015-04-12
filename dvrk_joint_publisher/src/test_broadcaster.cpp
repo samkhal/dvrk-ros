@@ -10,6 +10,8 @@
 #include <cmath>
 
 using namespace std;
+using namespace ros;
+
 typedef sensor_msgs::JointState* JointStatePtr;
 
 const double degree = M_PI/180;
@@ -35,21 +37,34 @@ void joint_position_callback(const sensor_msgs::JointState& msg)
 	}
 }
 
+int buffer;
+int count_b;
+
 void update_joint_state()
 {
 	if (joint_state.position.size() > 0)
 	{
 		//TODO : tests show system going pased joint limits. We need to examine the limts method here.
 		ROS_INFO("Incrementing joint states");
-		cout << joint_state.position.size() << endl;
-	    double outer_yaw_rand = 0.001;
-	    if (abs(joint_state.position[0] + outer_yaw_rand) < 2.6179)
+
+		double mult = 1;
+
+		if (count_b % buffer == 0)
+		{
+			int rand_m = rand();
+			cout << rand_m << endl;
+			if (rand_m == 0)
+				mult = -1;			
+		}
+	    double outer_yaw_rand = 0.001 * mult;
+	    if (abs(joint_state.position[0] + outer_yaw_rand) < 1.57)
 			joint_state.position[0] += outer_yaw_rand;
 
-	    double outer_pitch_rand = 0.001;
-	    if (abs(joint_state.position[1] + outer_pitch_rand) < 2.6179)
+	    double outer_pitch_rand = 0.001 * mult;
+	    if (abs(joint_state.position[1] + outer_pitch_rand) < 1.57)
 			joint_state.position[1] += outer_pitch_rand;
 
+		/*
 	    double outer_insertion_rand = 0.001;
 	    if (abs(joint_state.position[6] + outer_insertion_rand) < 2.6179)
 			joint_state.position[6] += outer_insertion_rand;
@@ -69,18 +84,23 @@ void update_joint_state()
 	    double outer_wrist_open_rand = 0.001;
 	    if (abs(joint_state.position[10] + outer_wrist_open_rand) < 2.6179)
 			joint_state.position[10] += outer_wrist_open_rand;
-
+		*/
+		count_b++;
 		ROS_INFO("Done incrementing joint states");
 	}
 }
 
 int main(int argc, char** argv)
 {
+	buffer = 100;
+	count_b = 0;
+
 	ros::init(argc, argv, "test_broadcaster");
 	ros::NodeHandle nh;
 
 	ROS_INFO("Creating Publisher and Subscriber");
 	//publish joint state messages to actuate psm
+	//note: execute rosnode kill /joint_state_publisher to prevent commands from conflicting
 	ros::Publisher joint_pub = nh.advertise<sensor_msgs::JointState>("/joint_states/joint_position_current", 1);
 	//attempt 2 publisher message based on actual_psm_control.py:'/dvrk_psm/set_position_joint'
 	//ros::Publisher joint_pub = nh.advertise<sensor_msgs::JointState>("/dvrk_psm/set_position_joint", 1);

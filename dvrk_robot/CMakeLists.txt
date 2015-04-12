@@ -10,6 +10,8 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   roscpp
   std_msgs
+  ar_track_alvar
+  sensor_msgs
 )
 
 set (REQUIRED_CISST_LIBRARIES
@@ -35,10 +37,9 @@ include (${CISST_USE_FILE})
 
 
 catkin_package(
-#  INCLUDE_DIRS include
+ # INCLUDE_DIRS include
 #  LIBRARIES dvrk_robot
-#  CATKIN_DEPENDS cisst_msgs cisst_ros_bridge geometry_msgs
-#                 roscpp std_msgs
+  CATKIN_DEPENDS cisst_msgs cisst_ros_bridge geometry_msgs roscpp std_msgs ar_track_alvar sensor_msgs
 #  DEPENDS system_lib
 )
 
@@ -74,7 +75,8 @@ if (cisst_FOUND_AS_REQUIRED)
 
 
  add_executable (cartesian_pose_node src/Listeners/psm_tf_listener.cpp)
-  target_link_libraries(cartesian_pose_node      
+
+ target_link_libraries(cartesian_pose_node      
      ${sawRobotIO1394_LIBRARIES}
       ${sawIntuitiveResearchKit_LIBRARIES}
       ${sawControllers_LIBRARIES}

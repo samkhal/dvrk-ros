@@ -36,6 +36,10 @@
           pkg="dvrk_joint_publisher"
           type="actual_psm_control.py"/-->
 
+    <node name="cartesian_pose_node" pkg="dvrk_robot" type="cartesian_pose_node" args="0" output="screen" />
+
+<include file="$(find dvrk_pcl)/launch/mono_camera.launch" />
+
     <node name="rviz" 
 	  pkg="rviz" 
 	  type="rviz"
