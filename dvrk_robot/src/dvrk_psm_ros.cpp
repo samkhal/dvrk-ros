@@ -133,11 +133,13 @@ int main(int argc, char** argv)
   robotBridge.AddPublisherFromReadCommand<prmPositionCartesianGet, geometry_msgs::Pose>(
         config_name, "GetPositionCartesian", "/dvrk_psm/cartesian_pose_current");
   robotBridge.AddPublisherFromReadCommand<vctDoubleVec, cisst_msgs::vctDoubleVec>(
-        pid->GetName(), "GetEffortJoint", "/dvrk_psm/joint_effort_current");
+        pid->GetName(), "GetEffortJointDesired", "/dvrk_psm/joint_effort_current");
   robotBridge.AddPublisherFromReadCommand<prmPositionJointGet, sensor_msgs::JointState>(
         pid->GetName(), "GetPositionJoint", "/dvrk_psm/joint_position_current");
   robotBridge.AddPublisherFromEventWrite<prmEventButton, std_msgs::Bool>(
   "ManipClutch","Button","/dvrk_psm/manip_clutch_state");
+  robotBridge.AddPublisherFromReadCommand<std::string, std_msgs::String>(
+        config_name,"GetRobotControlState","/dvrk_psm/robot_state_current");
 
 
   // Finally Working Form; However it is still unsafe since there is no safety check.
