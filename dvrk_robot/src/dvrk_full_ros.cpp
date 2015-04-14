@@ -358,12 +358,16 @@ int main(int argc, char ** argv)
                 "MTML", "SetRobotControlState", "/dvrk_mtml/set_robot_state");
     rosBridge.AddSubscriberToWriteCommand<prmPositionCartesianSet, geometry_msgs::Pose>(
                 "MTML", "SetPositionCartesian", "/dvrk_mtml/set_cartesian_pose");
+    rosBridge.AddSubscriberToWriteCommand<prmForceCartesianSet, geometry_msgs::Wrench>(
+                "MTML", "SetWrench", "/dvrk_mtml/set_wrench_static");
     rosBridge.AddSubscriberToWriteCommand<prmForceTorqueJointSet , sensor_msgs::JointState>(
                 "MTML-PID", "SetTorqueJoint", "/dvrk_mtml/set_joint_effort");
     rosBridge.AddSubscriberToWriteCommand<std::string , std_msgs::String>(
                 "MTMR", "SetRobotControlState", "/dvrk_mtmr/set_robot_state");
     rosBridge.AddSubscriberToWriteCommand<prmPositionCartesianSet, geometry_msgs::Pose>(
                 "MTMR", "SetPositionCartesian", "/dvrk_mtmr/set_cartesian_pose");
+    rosBridge.AddSubscriberToWriteCommand<prmForceCartesianSet, geometry_msgs::Wrench>(
+                "MTMR", "SetWrench", "/dvrk_mtmr/set_wrench_static");
     rosBridge.AddSubscriberToWriteCommand<prmForceTorqueJointSet , sensor_msgs::JointState>(
                 "MTMR-PID", "SetTorqueJoint", "/dvrk_mtmr/set_joint_effort");
 
