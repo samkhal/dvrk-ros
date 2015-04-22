@@ -331,6 +331,8 @@ int main(int argc, char ** argv)
                 "MTML-PID", "GetEffortJointDesired", "/dvrk_mtml/joint_effort_current");
     rosBridge.AddPublisherFromReadCommand<prmPositionJointGet, sensor_msgs::JointState>(
                 "MTMR", "GetPositionJoint", "/dvrk_mtmr/joint_position_current");
+    rosBridge.AddPublisherFromReadCommand<std::string, std_msgs::String>(
+                "MTMR", "GetRobotControlState", "/dvrk_mtmr/robot_state_current");
     rosBridge.AddPublisherFromReadCommand<vctDoubleVec, cisst_msgs::vctDoubleVec>(
                 "MTMR-PID", "GetEffortJointDesired", "/dvrk_mtmr/joint_effort_current");
     rosBridge.AddPublisherFromReadCommand<prmPositionJointGet, sensor_msgs::JointState>(
@@ -370,6 +372,8 @@ int main(int argc, char ** argv)
                 "MTMR", "SetWrench", "/dvrk_mtmr/set_wrench_static");
     rosBridge.AddSubscriberToWriteCommand<prmForceTorqueJointSet , sensor_msgs::JointState>(
                 "MTMR-PID", "SetTorqueJoint", "/dvrk_mtmr/set_joint_effort");
+    rosBridge.AddSubscriberToWriteCommand<vctBoolVec, std_msgs::Bool>(
+                "MTMR-PID", "EnableTorqueMode", "/dvrk_mtmr/enable_torque_mode");
 
     componentManager->AddComponent(&rosBridge);
     componentManager->Connect(rosBridge.GetName(), "MTML", "MTML", "Robot");
