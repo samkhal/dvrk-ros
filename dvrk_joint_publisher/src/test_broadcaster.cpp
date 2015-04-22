@@ -6,6 +6,7 @@
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
 #include <sensor_msgs/JointState.h>
+#include <ar_track_alvar/AlvarMarkers.h>
 #include <vector>
 #include <cmath>
 
@@ -15,26 +16,46 @@ using namespace ros;
 typedef sensor_msgs::JointState* JointStatePtr;
 
 const double degree = M_PI/180;
+sensor_msgs::JointState original;
 sensor_msgs::JointState joint_state;
+int initial = 0;
 
 void joint_position_callback(const sensor_msgs::JointState& msg)
 {
-	if (msg.position.size() != 12)
+	//cout << msg << endl;
+	if (initial == 0)
 	{
-		ROS_ERROR("Message has to have length 12");
+		original = msg;
+		initial = 1;
 	}
 	else
+		joint_state = msg;
+}
+
+void ar_pose_callback(const ar_track_alvar::AlvarMarkers& msg)
+{
+	/*
+	cout << joint_state.position.size() << endl;
+	cout << original.position.size() << endl;
+	if (msg.markers.size() > 0 && joint_state.position.size() > 0 && original.position.size() > 0)
 	{
-		ROS_INFO("Joint Position Callback");
-		joint_state.position.resize(0);
-		joint_state.position.push_back(msg.position[0]);
-		joint_state.position.push_back(msg.position[1]);
-		joint_state.position.push_back(msg.position[6]*1000);
-		joint_state.position.push_back(msg.position[7]);
-		joint_state.position.push_back(msg.position[8]);
-		joint_state.position.push_back(msg.position[9]);
-		joint_state.position.push_back(msg.position[10]);
-	}
+		if (joint_state.position[0] != original.position[0] &&
+			joint_state.position[2] != original.position[2] &&
+			joint_state.position[3] != original.position[3] &&
+			joint_state.position[4] != original.position[4] &&
+			joint_state.position[5] != original.position[5] &&
+			joint_state.position[6] != original.position[6] &&
+			joint_state.position[7] != original.position[7])
+		{*/
+			cout << msg.markers[0].pose.pose.position.x <<", ";
+			cout << msg.markers[0].pose.pose.position.y <<", ";
+			cout << msg.markers[0].pose.pose.position.z <<", ";
+			cout << msg.markers[0].pose.pose.orientation.w <<", ";
+			cout << msg.markers[0].pose.pose.orientation.x <<", ";
+			cout << msg.markers[0].pose.pose.orientation.y <<", ";
+			cout << msg.markers[0].pose.pose.orientation.z <<"\n";
+		//}
+	//}
 }
 
 int buffer;
@@ -101,15 +122,18 @@ int main(int argc, char** argv)
 	ROS_INFO("Creating Publisher and Subscriber");
 	//publish joint state messages to actuate psm
 	//note: execute rosnode kill /joint_state_publisher to prevent commands from conflicting
-	ros::Publisher joint_pub = nh.advertise<sensor_msgs::JointState>("/joint_states/joint_position_current", 1);
+	//ros::Publisher joint_pub = nh.advertise<sensor_msgs::JointState>("/joint_states/joint_position_current", 1);
 	//attempt 2 publisher message based on actual_psm_control.py:'/dvrk_psm/set_position_joint'
 	//ros::Publisher joint_pub = nh.advertise<sensor_msgs::JointState>("/dvrk_psm/set_position_joint", 1);
 	//subscribe to pulications of joint States to get starting state  TODO: would this cause a infinite loop of reacting to our own publications?
-	//ros::Subscriber joint_sub = nh.subscribe("joint_states/joint_position_current", 1, joint_position_callback);
+	//ros::Subscriber joint_sub_1 = nh.subscribe("/joint_states/joint_position_current", 1, joint_position_callback);
+	ros::Subscriber joint_sub = nh.subscribe("/ar_pose_marker", 1, ar_pose_callback);
+	
 	ros::Rate loop_rate(50);
+	ros::spin();
 	
 	//message
-	ROS_INFO("Setting joint names");
+	//ROS_INFO("Setting joint names");
 	//have to figure out which ones to move
 	/* //MESSAGES attempt 1
 	joint_state.name.push_back("one_outer_yaw_joint");
@@ -122,6 +146,8 @@ int main(int argc, char** argv)
 */
 	//attempt 2 to mirror messages used by dvrk test telop launch file
 	//this worked. The issue was that the message we declared only had 7 of the 12 needed joint names.
+
+	/*
 	joint_state.name.push_back("one_outer_yaw_joint");
 	joint_state.name.push_back("one_outer_pitch_joint_1");
 	joint_state.name.push_back("one_outer_pitch_joint_2");
@@ -148,27 +174,30 @@ int main(int argc, char** argv)
 	joint_state.position.push_back(0.0);
 	joint_state.position.push_back(0.0);
 	joint_state.position.push_back(0.0);
+	*/
 
-	cout << joint_state.position.size() << endl;
+	//cout << joint_state.position.size() << endl;
 	
+	/*
 	while (ros::ok())
 	{	
 		//update joint state header
-		ROS_INFO("Updating joint state header");
-		joint_state.header.stamp = ros::Time::now();
+		//ROS_INFO("Updating joint state header");
+		//joint_state.header.stamp = ros::Time::now();
 
 		//update joint state
-		ROS_INFO("Updating joint state");
-		update_joint_state();
+		//ROS_INFO("Updating joint state");
+		//update_joint_state();
 		
 		//send the joint state and transform
-		ROS_INFO("Publishing joint state");
-		joint_pub.publish(joint_state);
+		//ROS_INFO("Publishing joint state");
+		//joint_pub.publish(joint_state);
 
 		//sleep
-		ROS_INFO("Sleeping");
+		//ROS_INFO("Sleeping");
 		loop_rate.sleep();
 	}
+	*/
 	
 	return 0;
 }
