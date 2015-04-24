@@ -84,7 +84,8 @@ int main(int argc, char** argv)
 			force_wrench[0] = P_gain / error_vec[0];
 			force_wrench[1] = P_gain / error_vec[1];
 		} else {	//within buffer zone
-			force_wrench = P_gain * error_vec;
+			force_wrench[0] = P_gain * error_vec[0];
+			force_wrench[1] = P_gain * error_vec[1];
 		}
 
 		//enable torque mode, just in case (only actually necessary after Mono is released, but it doesn't hurt)
