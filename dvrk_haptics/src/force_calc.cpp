@@ -6,6 +6,7 @@
 #include <ros::geometry_msgs/Pose.h>
 #include <ros::geometry_msgs/Wrench.h>
 #include <ros::sensor_msgs/JointState.h>
+#include <ros::std_msgs/Bool.h>
 #include <vector>
 #include <cmath>
 
@@ -52,6 +53,9 @@ int main(int argc, char** argv)
 	//publisher for force vector
 	ros::Publisher w_pub = nh.advertise<geometry_msgs::Wrench>("/dvrk_mtmr/set_wrench_static", 1);
 
+	//publisher to enable torque mode
+	ros::Publisher torque_mode_pub = nh.advertise<std_msgs::Bool>("/dvrk_mtmr/enable_torque_mode",1);
+
 	ros::Rate loop_rate(50);
 
 	//vector of vectors, assuming this is what we'd 
@@ -70,6 +74,7 @@ int main(int argc, char** argv)
 	double error_mag = 0.0;
 	geometry_msgs::Pose tool_pose;
 	geometry_msgs::Wrench force_wrench = {0;0;0;0;0;0};
+	std_msgs::Bool bool_true = true;
 
 	while (ros::ok())
 	{	
@@ -81,6 +86,9 @@ int main(int argc, char** argv)
 		} else {	//within buffer zone
 			force_wrench = P_gain * error_vec;
 		}
+
+		//enable torque mode, just in case (only actually necessary after Mono is released, but it doesn't hurt)
+		torque_mode_pub.publish(bool_true);
 			
 		//send the joint state and transform
 		w_pub.publish(force_wrench);
