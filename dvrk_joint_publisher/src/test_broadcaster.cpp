@@ -47,13 +47,16 @@ void ar_pose_callback(const ar_track_alvar::AlvarMarkers& msg)
 			joint_state.position[6] != original.position[6] &&
 			joint_state.position[7] != original.position[7])
 		{*/
-			cout << msg.markers[0].pose.pose.position.x <<", ";
-			cout << msg.markers[0].pose.pose.position.y <<", ";
-			cout << msg.markers[0].pose.pose.position.z <<", ";
-			cout << msg.markers[0].pose.pose.orientation.w <<", ";
-			cout << msg.markers[0].pose.pose.orientation.x <<", ";
-			cout << msg.markers[0].pose.pose.orientation.y <<", ";
-			cout << msg.markers[0].pose.pose.orientation.z <<"\n";
+		if (msg.markers.size() > 0)
+		{
+			cout << msg.markers[0].pose.pose.position.x <<", "; //x
+			cout << msg.markers[0].pose.pose.position.y <<", "; //y
+			cout << msg.markers[0].pose.pose.position.z <<", "; //z 
+			cout << msg.markers[0].pose.pose.orientation.w <<", "; //w 
+			cout << msg.markers[0].pose.pose.orientation.x <<", "; //x 
+			cout << msg.markers[0].pose.pose.orientation.y <<", "; //y
+			cout << msg.markers[0].pose.pose.orientation.z <<"\n"; //z
+		}
 		//}
 	//}
 }

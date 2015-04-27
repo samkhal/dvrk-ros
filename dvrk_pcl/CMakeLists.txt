@@ -12,15 +12,18 @@ project(dvrk_pcl)
 # find_package(PCL REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
-  cv_bridge
+  	cv_bridge
 	image_geometry
-  image_transport
-  pcl_conversions
+  	image_transport
+  	pcl_conversions
 	pcl_ros
 	pcl_msgs
-  roscpp
-  sensor_msgs
+  	roscpp
+  	sensor_msgs
 	tf
+  	ar_track_alvar
+	std_msgs
+  
 )
 
 ## System dependencies are found with CMake's conventions
@@ -133,6 +136,7 @@ link_directories(
 ## Declare a cpp executable
 add_executable(pcl_viewer src/pcl_viewer.cpp)
 add_executable(pc_filter src/pc_filter.cpp)
+add_executable(artag_test src/artag_test.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -146,7 +150,9 @@ target_link_libraries(pcl_viewer
 target_link_libraries(pc_filter
    ${catkin_LIBRARIES} 
  )
-
+target_link_libraries(artag_test
+   ${catkin_LIBRARIES} 
+ )
 #############
 ## Install ##
 #############
