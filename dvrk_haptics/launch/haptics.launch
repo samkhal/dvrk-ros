@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- What is required 
+		1. uvc-camera package
+		2. camera_info_url
+		3. pcdViewer package
+		4. stereo_image_proc
+  -->
+  <!-- publishing all nodes required -->
+
+  <include file="$(find dvrk_haptics)/launch/mono_camera.launch"/>
+
+  <node pkg="dvrk_haptics" type="Haptics_Main" name="force_calc" output="screen" args="0" />
+  
+  <!--node pkg="tf" type="static_transform_publisher" name="camera_origin_tf_broadcaster" args="0.214791 0.538703 -0.0290401 0.448271 0.682679 -0.550918 0.0699451 origin camera 100"/-->
+	
+  <node pkg="tf" type="static_transform_publisher" name="camera_origin_tf_broadcaster" args="-0.117 -0.077 0.636 0.656, -0.327, 0.302, 0.609 camera origin 100"/>
+
+
+</launch>

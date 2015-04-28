@@ -64,9 +64,9 @@ find_package(catkin REQUIRED
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES dvrk_haptics
-  CATKIN_DEPENDS std_msgs
+  CATKIN_DEPENDS std_msgs ar_track_alvar geometry_msgs
 #  DEPENDS system_lib
-)
+)	
 
 ###########
 ## Build ##
@@ -82,7 +82,7 @@ catkin_package(
 # )
 
 ## Declare a cpp executable
- add_executable(dvrk_haptics_node src/force_calc.cpp)
+ add_executable(Haptics_Main src/force_calc.cpp)
  #add_executable(Array_Parsing src/Tag_Parsing/tag_parsing.cpp)
  #add_executable(Data_Modifier src/Tag_Parsing/data_modifier.cpp)
 
@@ -90,7 +90,7 @@ catkin_package(
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(dvrk_haptics_node dvrk_haptics_generate_messages_cpp)
 
- target_link_libraries(dvrk_haptics_node
+ target_link_libraries(Haptics_Main
    ${catkin_LIBRARIES}
  )
 
