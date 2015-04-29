@@ -11,8 +11,10 @@
 #include <iterator>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Wrench.h>
+#include <geometry_msgs/Point.h>
 #include <sensor_msgs/JointState.h>
 #include <nav_msgs/Path.h>
+#include <visualization_msgs/Marker.h>
 #include <std_msgs/Bool.h>
 #include <vector>
 #include <cmath>
@@ -318,7 +320,7 @@ int error_calc()
 		}
 		
 	}
-	/*
+	
 	double ax_1 = path_tfs[closest_point_idx].getOrigin()[0];
 	double ay_1 = path_tfs[closest_point_idx].getOrigin()[1];
 	double ax_2 = path_tfs[closest_point_idx-1].getOrigin()[0];
@@ -378,7 +380,6 @@ int error_calc()
 			error_vec[1] = ay_2 - by;
 		}
 	}
-	*/
 
 	return closest_point_idx; //failure case (no orthogonal projection) has error_vec storing the proper distance already
 }
@@ -417,6 +418,9 @@ int main(int argc, char** argv)
 
 	//publisher for publishing path
 	ros::Publisher path_pub = nh.advertise<nav_msgs::Path>("/path",1);
+
+	//publisher for error vector
+	ros::Publisher error_pub = nh.advertise<visualization_msgs::Marker>("/error_vec",1);
 
 	ros::Rate loop_rate(10);
 
@@ -550,10 +554,15 @@ int main(int argc, char** argv)
 			if(f_mag<-0.5){
 				f_mag = -0.5;
 			}
+			//not switched
+			
+			force_wrench.force.x = f_mag * error_vec[0] / error_mag;
+			force_wrench.force.y = f_mag * -error_vec[1] / error_mag;
+			
 
 			//Force is a vector aligned with error_vec with magnitued f_mag
-			force_wrench.force.y = f_mag * -error_vec[0] / error_mag;
-			force_wrench.force.x = f_mag * -error_vec[1] / error_mag;
+			//force_wrench.force.y = f_mag * -error_vec[0] / error_mag;
+			//force_wrench.force.x = f_mag * -error_vec[1] / error_mag;
 
 			// cout << "artag_tf ROTATION\n";
 			// cout << artag_tf.getBasis().getColumn(0)[0] << " " << artag_tf.getBasis().getColumn(0)[1] << " " << artag_tf.getBasis().getColumn(0)[2] << endl;
@@ -575,7 +584,36 @@ int main(int argc, char** argv)
 
 			//Publish path
 			path_pub.publish(path);
+
+			//Publish error vector
+			visualization_msgs::Marker arrow;
+			arrow.header.frame_id = "origin";
+			arrow.header.stamp = ros::Time();
+			arrow.ns = "error";
+			arrow.id = 0;
+			arrow.type = visualization_msgs::Marker::ARROW;
+			arrow.action = visualization_msgs::Marker::ADD;
+			arrow.color.a = 1.0;
+			arrow.color.r = 1.0;
+			arrow.color.b = 0.0;
+			arrow.color.g = 0.0;
+			arrow.scale.x = 0.002; //shaft diam
+			arrow.scale.y = 0.004; //head diam
+			arrow.scale.z = 0.01; //head length
+
+			geometry_msgs::Point start;
+			start.x = tool_position[0];
+			start.y = tool_position[1];
+			start.z = tool_position[2];
 			
+			geometry_msgs::Point end;
+			end.x = tool_position[0]+error_vec[0];
+			end.y = tool_position[1]+error_vec[1];
+			end.z = tool_position[2];
+
+			arrow.points.push_back(start);
+			arrow.points.push_back(end);
+			error_pub.publish(arrow);
 			
 			//sleep
 			spinOnce();
