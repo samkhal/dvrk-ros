@@ -215,12 +215,12 @@ std::vector<tf::Transform> transform_path()
 
 	//cout << "artag_tf_1: " << artag_tf_1.getOrigin()[0] << ", " << artag_tf_1.getOrigin()[1] << ", " << artag_tf_1.getOrigin()[2] << endl;
 	//cout << "ptip: " << ptip[0] << ", " << ptip[1] << ", " << ptip[2] << endl;
-	cout << "AR tag in base frame: " << origin_to_paper.getOrigin()[0] << ", " << origin_to_paper.getOrigin()[1] << ", " << origin_to_paper.getOrigin()[2] << endl;
+	//cout << "AR tag in base frame: " << origin_to_paper.getOrigin()[0] << ", " << origin_to_paper.getOrigin()[1] << ", " << origin_to_paper.getOrigin()[2] << endl;
 
 	// print rotation or ar tab relative to origin
-	cout << origin_to_paper.getBasis().getColumn(0)[0] << " " << origin_to_paper.getBasis().getColumn(0)[1] << " " << origin_to_paper.getBasis().getColumn(0)[2] << endl;
-	cout << origin_to_paper.getBasis().getColumn(1)[0] << " " << origin_to_paper.getBasis().getColumn(1)[1] << " " << origin_to_paper.getBasis().getColumn(1)[2] << endl;
-	cout << origin_to_paper.getBasis().getColumn(2)[0] << " " << origin_to_paper.getBasis().getColumn(2)[1] << " " << origin_to_paper.getBasis().getColumn(2)[2] << endl;
+	//cout << origin_to_paper.getBasis().getColumn(0)[0] << " " << origin_to_paper.getBasis().getColumn(0)[1] << " " << origin_to_paper.getBasis().getColumn(0)[2] << endl;
+	//cout << origin_to_paper.getBasis().getColumn(1)[0] << " " << origin_to_paper.getBasis().getColumn(1)[1] << " " << origin_to_paper.getBasis().getColumn(1)[2] << endl;
+	//cout << origin_to_paper.getBasis().getColumn(2)[0] << " " << origin_to_paper.getBasis().getColumn(2)[1] << " " << origin_to_paper.getBasis().getColumn(2)[2] << endl;
 
 	std::vector<geometry_msgs::PoseStamped> path_vector;
 
@@ -258,8 +258,8 @@ std::vector<tf::Transform> transform_path()
 		 
 	}
 
-	cout << "TRANSLATION\n";
-	cout << origin_to_paper.getOrigin()[0] << ", " << origin_to_paper.getOrigin()[1] << ", " << origin_to_paper.getOrigin()[2] << endl;
+	//cout << "TRANSLATION\n";
+	//cout << origin_to_paper.getOrigin()[0] << ", " << origin_to_paper.getOrigin()[1] << ", " << origin_to_paper.getOrigin()[2] << endl;
 	//cout << final_point.getOrigin()[0] << ", " << final_point.getOrigin()[1] << endl;
 
 	path.header.frame_id = "origin";
@@ -497,9 +497,9 @@ int main(int argc, char** argv)
 			// cout << artag_tf.getBasis().getColumn(1)[0] << " " << artag_tf.getBasis().getColumn(1)[1] << " " << artag_tf.getBasis().getColumn(1)[2] << endl;
 			// cout << artag_tf.getBasis().getColumn(2)[0] << " " << artag_tf.getBasis().getColumn(2)[1] << " " << artag_tf.getBasis().getColumn(2)[2] << endl;
 
-			cout << "Tool position: " << tool_position[0] << " " << tool_position[1] << endl;
-			cout << "Error Vec: " << error_vec[0] << " " << error_vec[1] << endl;
-			cout << "Force Wrench: " << force_wrench.force.x << " " << force_wrench.force.y << endl;
+			//cout << "Tool position: " << tool_position[0] << " " << tool_position[1] << endl;
+			//cout << "Error Vec: " << error_vec[0] << " " << error_vec[1] << endl;
+			//cout << "Force Wrench: " << force_wrench.force.x << " " << force_wrench.force.y << endl;
 
 			//enable torque mode, just in case (only actually necessary after Mono is released, but it doesn't hurt)
 			//torque_mode_pub.publish(bool_true);
@@ -571,9 +571,9 @@ int main(int argc, char** argv)
 
 			cout << "Tool position: " << tool_position[0] << "  " << tool_position[1] << " " << tool_position[2] << endl;
 			cout << "Error Vec: " << error_vec[0] << " " << error_vec[1] << endl;
-			cout << "Error Mag: " << error_mag << endl;
-			cout << "Point index: " << index << endl;
-			cout << "Point pose (origin): " << path_tfs[index].getOrigin()[0] << " " << path_tfs[index].getOrigin()[1] << " " << path_tfs[index].getOrigin()[2] << " " << endl;
+			//cout << "Error Mag: " << error_mag << endl;
+			//cout << "Point index: " << index << endl;
+			//cout << "Point pose (origin): " << path_tfs[index].getOrigin()[0] << " " << path_tfs[index].getOrigin()[1] << " " << path_tfs[index].getOrigin()[2] << " " << endl;
 			cout << "Force Wrench: " << force_wrench.force.x << " " << force_wrench.force.y << endl;
 
 			//enable torque mode, just in case (only actually necessary after Mono is released, but it doesn't hurt)
