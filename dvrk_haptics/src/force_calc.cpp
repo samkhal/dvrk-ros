@@ -47,21 +47,15 @@ tf::Transform artag_tf; //Relative to camera frame
 std::vector<tf::Transform> path_tfs; //Vector of point transforms with respect to origin frame
 nav_msgs::Path path; //Path object of points with respect to origin
 
-//tf::TransformListener *plistener;
-
- 
-
 void ParseData()
 {
-	//std::vector<std::string> m_data;
-	//std::istream& operator>>(std::istream& str, ArrayParser& data);
-
 
 	string line;
 
 	string path = ros::package::getPath("dvrk_haptics")+"/Data/sinVirtualFixtureWaypointsmmResolutionV3.csv";
 	ifstream myfile(path.c_str());
 
+    //import csv file if opening was successful
 	if (myfile.is_open())
 	{
 		 while(getline (myfile,line))
@@ -80,28 +74,15 @@ void ParseData()
 			}
 			token = line.substr(0, pos);
 			point_from_line.push_back(atof(token.c_str()));
-			 //std::istream& operator>>(std::istream& str, ArrayParser& data);
-
-			//for (size_t k = 0; k < point_from_line.size(); k++)
-			//	cout << point_from_line[k] << " ";
-			//cout << endl;
-
 			points.push_back(point_from_line);
 
 	 	}
 		myfile.close();
+	    cerr<<"READ the CSV FILE\n";
 	}
-
-	//!! Add error if failed
-
-
-
-	 // myfile << "Writing this to a file.\n";
-	  cerr<<"READ the CSV FILE\n";
-     
-     
 }
 
+//Transform AR tag pose into the base frame
 void PoseTransform()
 {
 
@@ -127,7 +108,6 @@ void ARtag_callback(const ar_track_alvar::AlvarMarkers& msg)
 	//code in here for getting the transform to the tag on the table
 	for (int i = 0; i < msg.markers.size(); i++){
 		if (msg.markers[i].id == 1){
-			//ROS_INFO("GAH");
 			ARTag_pose_1.position.x = msg.markers[i].pose.pose.position.x;
 			ARTag_pose_1.position.y = msg.markers[i].pose.pose.position.y;
 			ARTag_pose_1.position.z = msg.markers[i].pose.pose.position.z;
@@ -138,7 +118,6 @@ void ARtag_callback(const ar_track_alvar::AlvarMarkers& msg)
 		}
 		else if (msg.markers[i].id == 2){
 			//1 for arm tag, 2 for table tag
-			//ROS_INFO("GAH2");
 
 			ARTag_pose.position.x = msg.markers[i].pose.pose.position.x;
 			ARTag_pose.position.y = msg.markers[i].pose.pose.position.y;
@@ -148,55 +127,16 @@ void ARtag_callback(const ar_track_alvar::AlvarMarkers& msg)
 			ARTag_pose.orientation.z = msg.markers[i].pose.pose.orientation.z;
 			ARTag_pose.orientation.w = msg.markers[i].pose.pose.orientation.w;
 
-			//break;
 		}
 	}
-
 	PoseTransform();
 }
 
 
+//Transform the path into the base frame
 std::vector<tf::Transform> transform_path()
 {
 	std::vector<tf::Transform> ret_tf; //Vector of point transforms with respect to origin frame
-
-	//calculate origin_to_camera and origin_to_paper
-	//tf::Transform camera_to_origin;
-	//camera_to_origin.setIdentity();
-	//camera_to_origin.setOrigin(tf::Vector3(-0.1528, -0.1578, 0.5620)); //original
-	//camera_to_origin.setOrigin(tf::Vector3(-0.1529, -0.1514, 0.5604));
-	/*camera_to_origin.setBasis(tf::Matrix3x3(-0.6946, 0.4650, -0.5489, 
-											 0.7591, -0.1082, -0.6419, 
-											-0.3579, -0.8625, -0.2778));*/
-	//camera_to_origin.setBasis(tf::Matrix3x3(-0.6946, 0.7591, -0.3579, 
-	//										 0.4650, -0.1082, -0.8625, 
-	//										-0.5489, -0.6419, -0.2778));
-
-	//tf::Transform origin_to_camera = camera_to_origin.inverse();
-
-	//static tf::TransformBroadcaster tf_broadcaster; //broadcaster for tfs
-	//tf_broadcaster.sendTransform(tf::StampedTransform(origin_to_camera, ros::Time::now(), "origin", "camera"));
-	//tf_broadcaster.sendTransform(tf::StampedTransform(camera_to_origin, ros::Time::now(), "camera", "origin"));
-
-
-	//Print full Transform
-	//cout << "Transform from origin to camera (x,y,z,qx,qy,qz,qw): " << origin_to_camera.getOrigin()[0] << " " << origin_to_camera.getOrigin()[1] << " " << origin_to_camera.getOrigin()[2] << " "
-	//																	<< origin_to_camera.getRotation()[0] << " " << origin_to_camera.getRotation()[1] << " " << origin_to_camera.getRotation()[2] << " " << origin_to_camera.getRotation()[3] << endl; 
-
-
-	//cout << "MAG " << camera_to_origin.getOrigin().length() << endl;
-
-	//tf::Transform camera_to_artag1_to_origin;
-	//tf::Vector3 ptip(0.0089, -0.0689, 0.0155);
-	//camera_to_artag1_to_origin.setIdentity();
-	//camera_to_artag1_to_origin.setOrigin(artag_tf_1.getOrigin());
-	//camera_to_artag1_to_origin.setRotation(artag_tf_1.getRotation());
-	//camera_to_artag1_to_origin.setOrigin(ptip);
-	//tf_broadcaster.sendTransform(tf::StampedTransform(camera_to_artag1_to_origin, ros::Time::now(), "ar_marker_1", "origin"));
-
-
-	//tf::Transform origin_to_paper = origin_to_camera * artag_tf;
-
 	static tf::TransformListener listener;
 	tf::StampedTransform stamp_transform;
 	tf::Transform origin_to_paper;
@@ -300,8 +240,6 @@ void mtm_pose_callback(const geometry_msgs::Pose& pose_msg)
 	tf_broadcaster.sendTransform(tf::StampedTransform(mtm_tf, ros::Time::now(), "mtm_base", "mtm_tip"));
 }
 
-
-
 //calculate error of end-effector to closest point on path
 int error_calc()
 {	
@@ -397,11 +335,11 @@ int error_calc()
 }
 
 
-
+//Continuously update and publish force wrench
 int main(int argc, char** argv)
 {
 
-	ros::init(argc, argv, "magic_node");
+	ros::init(argc, argv, "haptics_node");
 	ros::NodeHandle nh;
 
 	//force_wrench = {0,0,0,0,0,0};
@@ -422,9 +360,6 @@ int main(int argc, char** argv)
 
 	//subscribe to mtm_pose
 	ros::Subscriber mtm_pose_sub = nh.subscribe("/dvrk_mtmr/joint_position_cartesian", 1, mtm_pose_callback);
-
-	//subscribe to AR tag 
-	//ros::Subscriber ARtag_sub = nh.subscribe("something for AR tag", 1, ARtag_callback);
 	
 	//publisher for force vector
 	ros::Publisher w_pub = nh.advertise<geometry_msgs::Wrench>("/dvrk_mtmr/set_wrench_static", 1);
@@ -444,20 +379,8 @@ int main(int argc, char** argv)
 	//subscribe to AR tag 
 	ros::Subscriber ARtag_sub = nh.subscribe("/ar_pose_marker", 1, &ARtag_callback);
 
-	//pub_pose = nh.advertise<tf::Transform>("/tf_to_artag",1);
 
-	//vector of vectors, assuming this is what we'd 
 
-	//std::vector<vector<double>> points(10, vector<double>(3));
-
-	/**Need help with file parsing..
-	 * and putting the data into the vector of vectors
-	 * 
-	 * 
-	 * 
-	**/
-
-	if(true){
 		double f_max = .5; //.5N
 		double width = .02; //1cm
 
@@ -496,21 +419,10 @@ int main(int argc, char** argv)
 			if(f_mag<-0.5){
 				f_mag = -0.5;
 			}
-			//not switched
 			
 			force_wrench.force.x = f_mag * error_vec[0] / error_mag;
 			force_wrench.force.y = f_mag * -error_vec[1] / error_mag;
 			
-
-			//Force is a vector aligned with error_vec with magnitued f_mag
-			//force_wrench.force.y = f_mag * -error_vec[0] / error_mag;
-			//force_wrench.force.x = f_mag * -error_vec[1] / error_mag;
-
-			// cout << "artag_tf ROTATION\n";
-			// cout << artag_tf.getBasis().getColumn(0)[0] << " " << artag_tf.getBasis().getColumn(0)[1] << " " << artag_tf.getBasis().getColumn(0)[2] << endl;
-			// cout << artag_tf.getBasis().getColumn(1)[0] << " " << artag_tf.getBasis().getColumn(1)[1] << " " << artag_tf.getBasis().getColumn(1)[2] << endl;
-			// cout << artag_tf.getBasis().getColumn(2)[0] << " " << artag_tf.getBasis().getColumn(2)[1] << " " << artag_tf.getBasis().getColumn(2)[2] << endl;
-
 			cout << "Tool position: " << tool_position[0] << "  " << tool_position[1] << " " << tool_position[2] << endl;
 			cout << "Error Vec: " << error_vec[0] << " " << error_vec[1] << endl;
 			//cout << "Error Mag: " << error_mag << endl;
@@ -521,7 +433,7 @@ int main(int argc, char** argv)
 			//enable torque mode, just in case (only actually necessary after Mono is released, but it doesn't hurt)
 			torque_mode_pub.publish(bool_true);
 				
-			//We have to transform the force_wrench into the master tip frame
+			//if we have to transform the force_wrench into the master tip frame
 			/*
 			tf::StampedTransform stamp_transform;
 			try{
@@ -579,12 +491,7 @@ int main(int argc, char** argv)
 			//sleep
 			spinOnce();
 			loop_rate.sleep();
-		}		
 	}
-
-
-	//transform first 3 components of error_vec into origin
-	
 
 	return 0;
 }
