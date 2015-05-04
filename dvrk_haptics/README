@@ -1,0 +1,14 @@
+To run both sides of the da Vinci:
+
+roscd dvrk_robot/config
+rosrun dvrk_robot dvrk_full_ros -j two-arms.json
+
+Then, to run the sine-wave haptic guidance:
+
+roslaunch dvrk_haptics haptics.launch
+
+-----------------------------------------------
+Notes: 
+1) The haptics node publishes a wrench to /dvrk_mtmr/set_wrench_static. Cisst must be configured to accept this, and to not override the wrench with gravity compensations.
+
+2) The published force is currently applied in the frame of the da Vinci's virtual proxy tip. As a result, twisting the master tip (the final joint) away from it's default position will cause shifts in the force applied.
