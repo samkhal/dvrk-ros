@@ -288,6 +288,18 @@ void tool_pose_callback(const geometry_msgs::Pose& pose_msg)
 	//cout << "Tool_position: " << tool_position[0] <<" "<< tool_position[1] << "\n";
 }
 
+//callback for mtm tip pose
+void mtm_pose_callback(const geometry_msgs::Pose& pose_msg)
+{
+	static tf::TransformBroadcaster tf_broadcaster; //broadcaster for tfs
+
+	tf::Transform mtm_tf;
+	mtm_tf.setOrigin(tf::Vector3(pose_msg.position.x, pose_msg.position.y, pose_msg.position.z));
+	mtm_tf.setRotation(tf::Quaternion( pose_msg.position.x, pose_msg.orientation.y, pose_msg.orientation.z, pose_msg.orientation.w));
+
+	tf_broadcaster.sendTransform(tf::StampedTransform(mtm_tf, ros::Time::now(), "mtm_base", "mtm_tip"));
+}
+
 
 
 //calculate error of end-effector to closest point on path
@@ -401,12 +413,16 @@ int main(int argc, char** argv)
 	force_wrench.torque.z = 0.0;
 
 
-	//plistener = new (tf::TransformListener);
+	static tf::TransformListener listener;
 
 	ROS_INFO("Creating Publisher and Subscriber");
 
 	//subscribe to end-effector pose
 	ros::Subscriber tool_pose_sub = nh.subscribe("/dvrk_psm1/joint_position_cartesian", 1, tool_pose_callback);
+
+	//subscribe to mtm_pose
+	ros::Subscriber mtm_pose_sub = nh.subscribe("/dvrk_mtmr/joint_position_cartesian", 1, mtm_pose_callback);
+
 	//subscribe to AR tag 
 	//ros::Subscriber ARtag_sub = nh.subscribe("something for AR tag", 1, ARtag_callback);
 	
@@ -441,80 +457,6 @@ int main(int argc, char** argv)
 	 * 
 	**/
 
-	 //Don's code
-	 if(false){
-		P_gain = .5; //.5N
-		buffer_zone = .01; //1cm
-
-		
-		bool_true.data = true;
-
-		ParseData();
-
-		//should return at index 341 
-		path_tfs = transform_path();
-
-		for (size_t i = 0; i < path_tfs.size(); i++)
-		{
-			//cout << path_tfs[i].getOrigin()[0] << ", " << path_tfs[i].getOrigin()[1] << endl;
-		}
-
-		while (ros::ok())
-		{	
-			path_tfs = transform_path();
-			
-			int index = error_calc();
-
-			error_mag = sqrt((error_vec[0]*error_vec[0]) + (error_vec[1]*error_vec[1]));
-
-			if (abs(error_vec[0]) <= buffer_zone){
-				force_wrench.force.x = P_gain * error_vec[0] * 100; //.5N @ 1cm
-			}
-			else {
-				if(abs(error_vec[0]) < 2*buffer_zone){
-					force_wrench.force.x = P_gain - P_gain*(error_vec[0] - buffer_zone); //negative forces and the subtraction sign?
-				}
-				else{
-					force_wrench.force.x = 0;
-				}
-
-			}
-
-
-			if (abs(error_vec[1]) <= buffer_zone){
-				force_wrench.force.y = P_gain * error_vec[1] * 100; //.5N @ 1cm
-			}
-			else {
-				if(abs(error_vec[1]) < 2*buffer_zone){
-					force_wrench.force.y = P_gain - P_gain*(error_vec[1] - buffer_zone);
-				}
-				else{
-					force_wrench.force.y = 0;
-				}
-			}
-			// cout << "artag_tf ROTATION\n";
-			// cout << artag_tf.getBasis().getColumn(0)[0] << " " << artag_tf.getBasis().getColumn(0)[1] << " " << artag_tf.getBasis().getColumn(0)[2] << endl;
-			// cout << artag_tf.getBasis().getColumn(1)[0] << " " << artag_tf.getBasis().getColumn(1)[1] << " " << artag_tf.getBasis().getColumn(1)[2] << endl;
-			// cout << artag_tf.getBasis().getColumn(2)[0] << " " << artag_tf.getBasis().getColumn(2)[1] << " " << artag_tf.getBasis().getColumn(2)[2] << endl;
-
-			//cout << "Tool position: " << tool_position[0] << " " << tool_position[1] << endl;
-			//cout << "Error Vec: " << error_vec[0] << " " << error_vec[1] << endl;
-			//cout << "Force Wrench: " << force_wrench.force.x << " " << force_wrench.force.y << endl;
-
-			//enable torque mode, just in case (only actually necessary after Mono is released, but it doesn't hurt)
-			//torque_mode_pub.publish(bool_true);
-				
-			//send the joint state and transform
-			//w_pub.publish(force_wrench);
-			
-			
-			//sleep
-			spinOnce();
-			loop_rate.sleep();
-		}
-	}
-
-	//Sam's version
 	if(true){
 		double f_max = .5; //.5N
 		double width = .02; //1cm
@@ -579,7 +521,26 @@ int main(int argc, char** argv)
 			//enable torque mode, just in case (only actually necessary after Mono is released, but it doesn't hurt)
 			torque_mode_pub.publish(bool_true);
 				
-			//send the joint state and transform
+			//We have to transform the force_wrench into the master tip frame
+			/*
+			tf::StampedTransform stamp_transform;
+			try{
+				listener.lookupTransform("mtm_tip","mtm_base", ros::Time(0), stamp_transform);
+
+				tf::Vector3 force_vec(force_wrench.force.x, force_wrench.force.y, 0); //Create vector from wrench
+				tf::Vector3 force_vec_tip_frame = stamp_transform * force_vec;        //Transform vector to tip frame
+				
+				force_wrench.force.x = force_vec_tip_frame[0];
+				force_wrench.force.y = force_vec_tip_frame[1];
+				force_wrench.force.z = force_vec_tip_frame[2];
+
+				//send the force_wrench
+				w_pub.publish(force_wrench);
+			}
+			catch (tf::TransformException ex){ //If not found continue without publishing wrench				
+			}*/
+			
+			//send the force_wrench
 			w_pub.publish(force_wrench);
 
 			//Publish path
@@ -620,7 +581,6 @@ int main(int argc, char** argv)
 			loop_rate.sleep();
 		}		
 	}
-	//!! End Sam's version
 
 
 	//transform first 3 components of error_vec into origin
